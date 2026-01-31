@@ -1,0 +1,40 @@
+const express = require("express");
+const router = express.Router();
+const Raspolozenje = require("../models/Raspolozenje");
+const auth = require("../middleware/auth");
+
+// GET – samo raspoloženja prijavljenog korisnika
+router.get("/", auth, async (req, res) => {
+  try {
+    const raspolozenja = await Raspolozenje
+      .find({ korisnik: req.user.id })
+      .sort({ datum: -1 });
+
+    res.json(raspolozenja);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Greška na serveru" });
+  }
+});
+
+// POST – dodaj raspoloženje prijavljenom korisniku
+router.post("/", auth, async (req, res) => {
+  try {
+    const { datum, raspolozenje, biljeske } = req.body;
+
+    const novoRaspolozenje = new Raspolozenje({
+      datum,
+      raspolozenje,
+      biljeske,
+      korisnik: req.user.id
+    });
+
+    const spremljeno = await novoRaspolozenje.save();
+    res.status(201).json(spremljeno);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: "Greška prilikom dodavanja raspoloženja" });
+  }
+});
+
+module.exports = router;
