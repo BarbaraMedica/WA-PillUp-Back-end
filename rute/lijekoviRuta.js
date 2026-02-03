@@ -1,23 +1,25 @@
 const express = require("express");
 const router = express.Router();
-const Lijek = require("../models/Lijek");
-const auth = require("../middleware/auth");
+const {
+  dohvatiLijekove,
+  dodajLijek,
+  azurirajLijek,
+  obrisiLijek
+} = require("../controllers/LijekoviController"); // controller
 
-// DOHVATI SAMO SVOJE LIJEKOVE
-router.get("/", auth, async (req, res) => {
-  const lijekovi = await Lijek.find({ korisnik: req.user.id });
-  res.json(lijekovi);
-});
+const auth = require("../middleware/auth"); // JWT autentikacija
 
-// DODAJ LIJEK
-router.post("/", auth, async (req, res) => {
-  const lijek = new Lijek({
-    ...req.body,
-    korisnik: req.user.id
-  });
 
-  await lijek.save();
-  res.status(201).json(lijek);
-});
+// DOHVATI SVE LIJEKOVE KORISNIKA
+router.get("/", auth, dohvatiLijekove);
+
+// DODAJ NOVI LIJEK
+router.post("/", auth, dodajLijek);
+
+// AŽURIRAJ LIJEK
+router.put("/:id", auth, azurirajLijek);
+
+// OBRIŠI LIJEK
+router.delete("/:id", auth, obrisiLijek);
 
 module.exports = router;
