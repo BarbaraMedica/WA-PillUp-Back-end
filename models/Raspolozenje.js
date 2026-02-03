@@ -14,4 +14,4 @@ const raspolozenjeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Raspoloženje", raspolozenjeSchema);
+module.exports = mongoose.model("Raspolozenje", raspolozenjeSchema);

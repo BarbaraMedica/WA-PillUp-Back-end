@@ -1,54 +1,35 @@
 const express = require("express");
 const router = express.Router();
-const Korisnik = require("../models/Korisnik");
-const jwt = require("jsonwebtoken");
+const { registracija, prijava } = require("../controllers/autentifikacijaController");
+const { registracijaValidator } = require("../validators/autentifikacijaValidator");
+const { body, validationResult } = require("express-validator");
 
 // REGISTRACIJA
-router.post("/registracija", async (req, res) => {
-  try {
-    console.log("Registracija zahtjev:", req.body);
-    const { email, lozinka } = req.body;
-
-    const postoji = await Korisnik.findOne({ email });
-    if (postoji) {
-      return res.status(400).json({ msg: "Korisnik već postoji" });
+router.post(
+  "/registracija",
+  registracijaValidator,
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-
-    const korisnik = new Korisnik({ email, lozinka });
-    await korisnik.save();
-
-    res.status(201).json({ msg: "Registracija uspješna" });
-  } catch (err) {
-    console.error("Registracija greška:", err.message, err.stack);
-    res.status(500).json({ msg: "Greška na serveru", error: err.message });
-  }
-});
+    next();
+  },
+  registracija
+);
 
 // PRIJAVA
-router.post("/prijava", async (req, res) => {
-  try {
-    const { email, lozinka } = req.body;
-
-    const korisnik = await Korisnik.findOne({ email });
-    if (!korisnik) {
-      return res.status(400).json({ msg: "Neispravni podaci" });
+router.post("/prijava", 
+  body('email').isEmail(),
+  body('lozinka').notEmpty(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-
-    const isValid = await korisnik.provjeriLozinku(lozinka);
-    if (!isValid) {
-      return res.status(400).json({ msg: "Neispravni podaci" });
-    }
-
-    const token = jwt.sign(
-      { id: korisnik._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    res.json({ token });
-  } catch (err) {
-    res.status(500).json({ msg: "Greška na serveru" });
-  }
-});
+    next();
+  },
+  prijava
+);
 
 module.exports = router;

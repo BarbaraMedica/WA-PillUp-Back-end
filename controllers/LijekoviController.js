@@ -14,19 +14,21 @@ exports.dohvatiLijekove = async (req, res) => {
 // Dodaj novi lijek
 exports.dodajLijek = async (req, res) => {
   try {
-    const { ime, doza, vrijeme, nacin, kolicina, trajanje } = req.body;
+    const { ime, doza, vrijeme, nacin, kolicina, trajanje, podsjetnik } = req.body;
     const noviLijek = await Lijek.create({
       korisnik: req.user.id,
       ime,
       doza,
       vrijeme,
       nacin,
-      kolicina,
-      trajanje,
-      preostalo: kolicina
+      kolicina: Number(kolicina),
+      trajanje: Number(trajanje),
+      preostalo: Number(kolicina),
+      podsjetnik: Boolean(podsjetnik)
     });
     res.status(201).json(noviLijek);
   } catch (error) {
+    console.error("Greška pri dodavanju lijeka:", error);
     res.status(500).json({ message: "Greška pri dodavanju lijeka" });
   }
 };
@@ -55,5 +57,30 @@ exports.obrisiLijek = async (req, res) => {
     res.json({ message: "Lijek obrisan" });
   } catch (error) {
     res.status(500).json({ message: "Greška pri brisanju lijeka" });
+  }
+};
+
+// Dohvati lijekove sa podsjetnicima
+exports.dohvatiLijekoveSaPodsjetnicima = async (req, res) => {
+  try {
+    const korisnikId = req.user.id;
+    const lijekovi = await Lijek.find({ korisnik: korisnikId, podsjetnik: true });
+    res.json(lijekovi);
+  } catch (error) {
+    res.status(500).json({ message: "Greška pri dohvaćanju lijekova sa podsjetnicima" });
+  }
+};
+
+// Toggle podsjetnik za lijek
+exports.togglePodsjetnik = async (req, res) => {
+  try {
+    const lijek = await Lijek.findById(req.params.id);
+    if (!lijek) return res.status(404).json({ message: "Lijek nije pronađen" });
+
+    lijek.podsjetnik = !lijek.podsjetnik;
+    const azuriranLijek = await lijek.save();
+    res.json(azuriranLijek);
+  } catch (error) {
+    res.status(500).json({ message: "Greška pri toggle-u podsjetnika" });
   }
 };

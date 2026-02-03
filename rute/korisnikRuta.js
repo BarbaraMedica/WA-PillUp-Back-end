@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const Korisnik = require("../models/Korisnik");
+const { dohvatiKorisnika, postaviIme, dohvatiPostavke, azurirajPostavke } = require("../controllers/KorisnikController");
 const auth = require("../middleware/auth");
 
-router.get("/profil", auth, async (req, res) => {
-  const korisnik = await Korisnik.findById(req.user.id).select("-lozinka");
-  res.json(korisnik);
-});
+router.get("/profil", auth, dohvatiKorisnika);
+router.post("/postavi-ime", auth, postaviIme);
+router.get("/postavke", auth, dohvatiPostavke);
+router.post("/postavke", auth, azurirajPostavke);
 
 module.exports = router;

@@ -13,7 +13,8 @@ const lijekSchema = new mongoose.Schema(
     nacin: String,
     kolicina: Number,
     trajanje: Number,
-    preostalo: Number
+    preostalo: Number,
+    podsjetnik: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

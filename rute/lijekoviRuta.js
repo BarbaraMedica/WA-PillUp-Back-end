@@ -4,10 +4,13 @@ const {
   dohvatiLijekove,
   dodajLijek,
   azurirajLijek,
-  obrisiLijek
+  obrisiLijek,
+  dohvatiLijekoveSaPodsjetnicima,
+  togglePodsjetnik
 } = require("../controllers/LijekoviController"); // controller
 
 const auth = require("../middleware/auth"); // JWT autentikacija
+const role = require("../middleware/roleMiddleware");
 
 
 // DOHVATI SVE LIJEKOVE KORISNIKA
@@ -20,6 +23,12 @@ router.post("/", auth, dodajLijek);
 router.put("/:id", auth, azurirajLijek);
 
 // OBRIŠI LIJEK
-router.delete("/:id", auth, obrisiLijek);
+router.delete("/:id", auth, role("admin"), obrisiLijek);
+
+// DOHVATI LIJEKOVE SA PODSJETNICIMA
+router.get("/sa-podsjetnicima", auth, dohvatiLijekoveSaPodsjetnicima);
+
+// TOGGLE PODSJETNIK
+router.patch("/:id/toggle-podsjetnik", auth, togglePodsjetnik);
 
 module.exports = router;
