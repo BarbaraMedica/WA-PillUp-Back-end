@@ -1,11 +1,11 @@
-const express = require("express");
+import express from "express";
+import { dohvatiKorisnika, postaviIme, dohvatiPostavke, azurirajPostavke } from "../controllers/KorisnikController.js";
+import auth from "../middleware/auth";
 const router = express.Router();
-const { dohvatiKorisnika, postaviIme, dohvatiPostavke, azurirajPostavke } = require("../controllers/KorisnikController");
-const auth = require("../middleware/auth");
 
 router.get("/profil", auth, dohvatiKorisnika);
 router.post("/postavi-ime", auth, postaviIme);
 router.get("/postavke", auth, dohvatiPostavke);
 router.post("/postavke", auth, azurirajPostavke);
 
-module.exports = router;
+export default router;

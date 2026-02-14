@@ -1,5 +1,8 @@
-const Korisnik = require("../models/Korisnik");
-const { sign } = require("jsonwebtoken");
+import Korisnik  from "../models/Korisnik";
+import { sign } from "jsonwebtoken";
+import crypto from "crypto";
+import Korisnik from "../modeli/Korisnik.js";
+import { sendEmail } from "../servisi/emailService.js";
 
 async function registracija(req, res, next) {
   try {
@@ -48,4 +51,35 @@ async function prijava(req, res, next) {
   }
 }
 
-module.exports = { registracija, prijava };
+async function verifyEmail(req, res) {
+  try {
+    const korisnik = await Korisnik.findOne({
+      verificationToken: req.params.token
+    });
+
+    if (!korisnik) {
+      return res.status(400).json({ message: "Neispravan token" });
+    }
+
+    korisnik.isVerified = true;
+    korisnik.verificationToken = undefined;
+
+    await korisnik.save();
+
+    res.json({ message: "Email potvrđen" });
+  } catch (error) {
+    res.status(500).json({ message: "Greška na serveru" });
+  }
+};
+const token = crypto.randomBytes(32).toString("hex");
+
+korisnik.verificationToken = token;
+await korisnik.save();
+
+await sendEmail(
+  korisnik.email,
+  "Potvrda emaila",
+  `http://localhost:4000/api/autentikacija/verify/${token}`
+);
+
+export { registracija, prijava, verifyEmail };

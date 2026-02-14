@@ -1,17 +1,17 @@
-const express = require("express");
+import express from "express";
+
 const router = express.Router();
-const {
+import {
   dohvatiLijekove,
   dodajLijek,
   azurirajLijek,
   obrisiLijek,
   dohvatiLijekoveSaPodsjetnicima,
   togglePodsjetnik
-} = require("../controllers/LijekoviController"); // controller
+} from "../controllers/LijekoviController.js"; 
 
-const auth = require("../middleware/auth"); // JWT autentikacija
-const role = require("../middleware/roleMiddleware");
-
+import auth from "../middleware/auth.js";
+import role from "../middleware/roleMiddleware.js";
 
 // DOHVATI SVE LIJEKOVE KORISNIKA
 router.get("/", auth, dohvatiLijekove);
@@ -31,4 +31,4 @@ router.get("/sa-podsjetnicima", auth, dohvatiLijekoveSaPodsjetnicima);
 // TOGGLE PODSJETNIK
 router.patch("/:id/toggle-podsjetnik", auth, togglePodsjetnik);
 
-module.exports = router;
+export default router;

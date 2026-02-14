@@ -1,6 +1,6 @@
-const { body } = require("express-validator");
+import { body } from "express-validator";
 
-exports.registracijaValidator = [
+export const registracijaValidator = [
   body("email")
     .isEmail()
     .withMessage("Email nije ispravnog formata"),

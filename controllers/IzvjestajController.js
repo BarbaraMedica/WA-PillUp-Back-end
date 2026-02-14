@@ -1,8 +1,9 @@
-const Lijek = require("../models/Lijek");
-const Korisnik = require("../models/Korisnik");
+import Lijek from "../models/Lijek.js";
+import Terapija from "../models/Terapija.js";
+import Korisnik from "../models/Korisnik.js";
 
 // Generiraj PDF izvještaj
-exports.generirajPDF = async (req, res) => {
+export const generirajPDF = async (req, res) => {
   try {
     const korisnikId = req.user.id;
     const lijekovi = await Lijek.find({ korisnik: korisnikId });
@@ -21,7 +22,7 @@ exports.generirajPDF = async (req, res) => {
 };
 
 // Dohvati uzete lijekove
-exports.dohvatiUžeteLijekove = async (req, res) => {
+export const dohvatiUžeteLijekove = async (req, res) => {
   try {
     const korisnikId = req.user.id;
     // Pretpostavimo da ima polje za uzete lijekove, za sada vraćam sve
@@ -33,7 +34,7 @@ exports.dohvatiUžeteLijekove = async (req, res) => {
 };
 
 // Dohvati bilješke
-exports.dohvatiBilješke = async (req, res) => {
+export const dohvatiBilješke = async (req, res) => {
   try {
     // Pretpostavimo da ima model Bilješka, za sada vraćam praznu listu
     res.json([]);

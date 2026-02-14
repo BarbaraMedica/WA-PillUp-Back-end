@@ -1,6 +1,6 @@
-const Korisnik = require("../models/Korisnik");
+import Korisnik from "../models/Korisnik.js";
 
-exports.dohvatiKorisnika = async (req, res) => {
+export const dohvatiKorisnika = async (req, res) => {
   try {
     const korisnik = await Korisnik.findById(req.user.id).select("-lozinka");
     if (!korisnik) return res.status(404).json({ message: "Korisnik nije pronađen" });
@@ -10,7 +10,7 @@ exports.dohvatiKorisnika = async (req, res) => {
   }
 };
 
-exports.postaviIme = async (req, res) => {
+export const postaviIme = async (req, res) => {
   try {
     const { ime } = req.body;
     const korisnik = await Korisnik.findByIdAndUpdate(
@@ -25,7 +25,7 @@ exports.postaviIme = async (req, res) => {
   }
 };
 
-exports.dohvatiPostavke = async (req, res) => {
+export const dohvatiPostavke = async (req, res) => {
   try {
     const korisnik = await Korisnik.findById(req.user.id).select("postavke");
     if (!korisnik) return res.status(404).json({ message: "Korisnik nije pronađen" });
@@ -35,7 +35,7 @@ exports.dohvatiPostavke = async (req, res) => {
   }
 };
 
-exports.azurirajPostavke = async (req, res) => {
+export const azurirajPostavke = async (req, res) => {
   try {
     const postavke = req.body;
     const korisnik = await Korisnik.findByIdAndUpdate(

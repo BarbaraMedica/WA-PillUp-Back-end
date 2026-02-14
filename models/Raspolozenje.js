@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+import mangoose from "mongoose";
+import Korisnik from "./Korisnik.js";
 
 const raspolozenjeSchema = new mongoose.Schema(
   {
@@ -13,5 +14,4 @@ const raspolozenjeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-module.exports = mongoose.model("Raspolozenje", raspolozenjeSchema);
+export default mongoose.model("Raspolozenje", raspolozenjeSchema);

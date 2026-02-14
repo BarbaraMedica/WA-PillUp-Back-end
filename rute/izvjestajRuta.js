@@ -1,10 +1,12 @@
-const express = require("express");
+import express from "express";
+import auth from "../middleware/auth.js";
+import { generirajPDF, dohvatiUžeteLijekove, dohvatiBilješke } from "../controllers/IzvjestajController.js";
+
 const router = express.Router();
-const { generirajPDF, dohvatiUžeteLijekove, dohvatiBilješke } = require("../controllers/IzvjestajController");
-const auth = require("../middleware/auth");
+
 
 router.get("/pdf", auth, generirajPDF);
 router.get("/uzeti-lijekovi", auth, dohvatiUžeteLijekove);
 router.get("/biljezke", auth, dohvatiBilješke);
 
-module.exports = router;
+export default router;

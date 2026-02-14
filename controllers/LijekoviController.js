@@ -1,7 +1,7 @@
-const Lijek = require("../models/Lijek");
+import Lijek from "../models/Lijek.js";
 
 // Dohvati sve lijekove za korisnika
-exports.dohvatiLijekove = async (req, res) => {
+export const dohvatiLijekove = async (req, res) => {
   try {
     const korisnikId = req.user.id;
     const lijekovi = await Lijek.find({ korisnik: korisnikId });
@@ -12,7 +12,7 @@ exports.dohvatiLijekove = async (req, res) => {
 };
 
 // Dodaj novi lijek
-exports.dodajLijek = async (req, res) => {
+export const dodajLijek = async (req, res) => {
   try {
     const { ime, doza, vrijeme, nacin, kolicina, trajanje, podsjetnik } = req.body;
     const noviLijek = await Lijek.create({
@@ -34,7 +34,7 @@ exports.dodajLijek = async (req, res) => {
 };
 
 // Ažuriraj lijek
-exports.azurirajLijek = async (req, res) => {
+export const azurirajLijek = async (req, res) => {
   try {
     const lijek = await Lijek.findById(req.params.id);
     if (!lijek) return res.status(404).json({ message: "Lijek nije pronađen" });
@@ -48,7 +48,7 @@ exports.azurirajLijek = async (req, res) => {
 };
 
 // Obriši lijek
-exports.obrisiLijek = async (req, res) => {
+export const obrisiLijek = async (req, res) => {
   try {
     const lijek = await Lijek.findById(req.params.id);
     if (!lijek) return res.status(404).json({ message: "Lijek nije pronađen" });
@@ -61,7 +61,7 @@ exports.obrisiLijek = async (req, res) => {
 };
 
 // Dohvati lijekove sa podsjetnicima
-exports.dohvatiLijekoveSaPodsjetnicima = async (req, res) => {
+export const dohvatiLijekoveSaPodsjetnicima = async (req, res) => {
   try {
     const korisnikId = req.user.id;
     const lijekovi = await Lijek.find({ korisnik: korisnikId, podsjetnik: true });
@@ -72,7 +72,7 @@ exports.dohvatiLijekoveSaPodsjetnicima = async (req, res) => {
 };
 
 // Toggle podsjetnik za lijek
-exports.togglePodsjetnik = async (req, res) => {
+export const togglePodsjetnik = async (req, res) => {
   try {
     const lijek = await Lijek.findById(req.params.id);
     if (!lijek) return res.status(404).json({ message: "Lijek nije pronađen" });

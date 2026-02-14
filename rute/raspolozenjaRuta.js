@@ -1,8 +1,7 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const Raspolozenje = require("../models/Raspolozenje");
-const auth = require("../middleware/auth");
-
+import Raspolozenje from "../models/Raspolozenje.js";
+import auth from "../middleware/auth.js";
 // GET – samo raspoloženja prijavljenog korisnika
 router.get("/", auth, async (req, res) => {
   try {
@@ -37,4 +36,4 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

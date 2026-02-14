@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+import mangoose from "mongoose";
+import Korisnik from "./Korisnik.js";
 
-const lijekSchema = new mongoose.Schema(
+export const lijekSchema = new mongoose.Schema(
   {
     korisnik: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,5 +19,5 @@ const lijekSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+export default mongoose.model("Lijek", lijekSchema);
 
-module.exports = mongoose.model("Lijek", lijekSchema);

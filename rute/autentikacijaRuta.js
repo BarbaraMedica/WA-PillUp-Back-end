@@ -1,8 +1,10 @@
-const express = require("express");
+import express from "express";
+import { body, validationResult } from "express-validator";
+import { registracija, prijava } from "../controllers/autentifikacijaController.js";
+import { registracijaValidator } from "../validators/autentifikacijaValidator.js";
+import { verifyEmail } from "../controllers/autentifikacijaController.js";
+
 const router = express.Router();
-const { registracija, prijava } = require("../controllers/autentifikacijaController");
-const { registracijaValidator } = require("../validators/autentifikacijaValidator");
-const { body, validationResult } = require("express-validator");
 
 // REGISTRACIJA
 router.post(
@@ -31,5 +33,6 @@ router.post("/prijava",
   },
   prijava
 );
+router.get("/verify/:token", verifyEmail);
 
-module.exports = router;
+export default router;

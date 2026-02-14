@@ -1,37 +1,66 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
-const KorisnikSchema = new mongoose.Schema(
+const korisnikSchema = new mongoose.Schema(
   {
-    email: { type: String, required: true, unique: true },
-    lozinka: { type: String, required: true },
-    ime: { type: String },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true
+    },
+    lozinka: {
+      type: String,
+      required: true,
+      minlength: 6
+    },
+    ime: {
+      type: String,
+      trim: true
+    },
     postavke: {
-      notifikacije: { type: Boolean, default: true },
-      podsjetnici: { type: Boolean, default: true }
+      notifikacije: {
+        type: Boolean,
+        default: true
+      },
+      podsjetnici: {
+        type: Boolean,
+        default: true
+      }
     },
     uloga: {
       type: String,
       enum: ["user", "admin"],
       default: "user"
-    }
+    },
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+    verificationToken: String,
+    resetToken: String,
+    resetTokenExpiry: Date
   },
   { timestamps: true }
 );
 
-// hash lozinke prije spremanja
-KorisnikSchema.pre("save", async function () {
-  if (!this.isModified("lozinka")) return;
+// hash lozinke
+korisnikSchema.pre("save", async function (next) {
+  if (!this.isModified("lozinka")) return next();
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.lozinka = await bcrypt.hash(this.lozinka, salt);
+    next();
   } catch (error) {
-    throw error;
+    next(error);
   }
 });
 
-KorisnikSchema.methods.provjeriLozinku = async function (lozinka) {
-  return await bcrypt.compare(lozinka, this.lozinka);
+
+korisnikSchema.methods.provjeriLozinku = async function (lozinka) {
+  return bcrypt.compare(lozinka, this.lozinka);
 };
 
-module.exports = mongoose.model("Korisnik", KorisnikSchema);
+export default mongoose.model("Korisnik", korisnikSchema);
