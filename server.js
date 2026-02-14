@@ -4,8 +4,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cron from "node-cron";
 
-import Terapija from "./modeli/Terapija.js";
-import { sendEmail } from "./servisi/emailService.js";
+import Terapija from "./models/Terapija.js";
+import { sendEmail } from "./services/emailService.js";
+import UzimanjeLijeka from "./models/UzimanjeLijeka.js";
 
 import autentikacijaRuta from "./rute/autentikacijaRuta.js";
 import lijekoviRuta from "./rute/lijekoviRuta.js";
@@ -56,16 +57,58 @@ cron.schedule("* * * * *", async () => {
     }).populate("korisnik lijek");
 
     for (const t of terapije) {
+
+      if (!t.korisnik.postavke?.notifikacije) continue;
+
       await sendEmail(
         t.korisnik.email,
         "Vrijeme za lijek",
         `Vrijeme je za uzeti lijek ${t.lijek.naziv}`
       );
     }
+
   } catch (error) {
     console.error("Cron greška:", error);
   }
 });
+
+cron.schedule("59 23 * * *", async () => {
+  try {
+    const danas = new Date();
+    danas.setHours(0, 0, 0, 0);
+
+    const terapije = await Terapija.find({
+      aktivna: true
+    });
+
+    for (const terapija of terapije) {
+
+      for (const vrijeme of terapija.vremenaUzimanja) {
+
+        const postoji = await UzimanjeLijeka.findOne({
+          korisnik: terapija.korisnik,
+          terapija: terapija._id,
+          datum: { $gte: danas },
+          vrijeme
+        });
+
+        if (!postoji) {
+          await UzimanjeLijeka.create({
+            korisnik: terapija.korisnik,
+            terapija: terapija._id,
+            datum: new Date(),
+            vrijeme,
+            status: "preskočen"
+          });
+        }
+      }
+    }
+
+  } catch (error) {
+    console.error("Daily cron greška:", error);
+  }
+});
+
 
 
 app.use((req, res) => {
