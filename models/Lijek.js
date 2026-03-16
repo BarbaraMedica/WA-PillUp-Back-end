@@ -1,4 +1,4 @@
-import mangoose from "mongoose";
+import mongoose from "mongoose";
 import Korisnik from "./Korisnik.js";
 
 export const lijekSchema = new mongoose.Schema(
@@ -15,6 +15,7 @@ export const lijekSchema = new mongoose.Schema(
     kolicina: Number,
     trajanje: Number,
     preostalo: Number,
+    ucestalost: { type: Number, default: 1 },
     podsjetnik: { type: Boolean, default: false }
   },
   { timestamps: true }

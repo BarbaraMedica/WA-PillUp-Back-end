@@ -7,12 +7,17 @@ import cron from "node-cron";
 import Terapija from "./models/Terapija.js";
 import { sendEmail } from "./services/emailService.js";
 import UzimanjeLijeka from "./models/UzimanjeLijeka.js";
+import Biljeska from "./models/Biljeska.js";
+
 
 import autentikacijaRuta from "./rute/autentikacijaRuta.js";
+import izvjestajRuta from "./rute/izvjestajRuta.js";
 import lijekoviRuta from "./rute/lijekoviRuta.js";
 import raspolozenjaRuta from "./rute/raspolozenjaRuta.js";
 import korisnikRuta from "./rute/korisnikRuta.js";
 import terapijaRuta from "./rute/terapijaRuta.js";
+import statistikaRuta from "./rute/statistika.js";
+import biljeskeRuta from "./rute/biljeskeRuta.js";
 
 // Učitavanje .env
 dotenv.config();
@@ -40,7 +45,9 @@ app.use("/api/lijekovi", lijekoviRuta);
 app.use("/api/raspolozenja", raspolozenjaRuta);
 app.use("/api/korisnik", korisnikRuta);
 app.use("/api/terapije", terapijaRuta);
-
+app.use("/api/izvjestaji", izvjestajRuta);
+app.use("/api/statistika", statistikaRuta);
+app.use("/api/biljeske", biljeskeRuta);
 app.get("/", (req, res) => {
   res.send("PillUp backend radi!");
 });

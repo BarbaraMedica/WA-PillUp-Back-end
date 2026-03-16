@@ -1,8 +1,7 @@
-import Korisnik  from "../models/Korisnik";
-import { sign } from "jsonwebtoken";
+import Korisnik from "../models/Korisnik.js";
+import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import Korisnik from "../modeli/Korisnik.js";
-import { sendEmail } from "../servisi/emailService.js";
+import { sendEmail } from "../services/emailService.js";
 
 async function registracija(req, res, next) {
   try {
@@ -36,7 +35,7 @@ async function prijava(req, res, next) {
       return res.status(400).json({ msg: "Neispravni podaci" });
     }
 
-    const token = sign(
+    const token = jwt.sign(
       {
         id: korisnik._id,
         uloga: korisnik.uloga   
@@ -71,15 +70,5 @@ async function verifyEmail(req, res) {
     res.status(500).json({ message: "Greška na serveru" });
   }
 };
-const token = crypto.randomBytes(32).toString("hex");
-
-korisnik.verificationToken = token;
-await korisnik.save();
-
-await sendEmail(
-  korisnik.email,
-  "Potvrda emaila",
-  `http://localhost:4000/api/autentikacija/verify/${token}`
-);
 
 export { registracija, prijava, verifyEmail };

@@ -1,4 +1,4 @@
-import mangoose from "mongoose";
+import mongoose from "mongoose";
 import Korisnik from "./Korisnik.js";
 
 const raspolozenjeSchema = new mongoose.Schema(

@@ -4,7 +4,7 @@ import {
   createTerapija,
   getMojeTerapije,
   deleteTerapija
-} from "../kontroleri/TerapijaController.js";
+} from "../controllers/TerapijaController.js";
 
 const router = express.Router();
 

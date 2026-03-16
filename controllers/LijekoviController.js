@@ -14,7 +14,7 @@ export const dohvatiLijekove = async (req, res) => {
 // Dodaj novi lijek
 export const dodajLijek = async (req, res) => {
   try {
-    const { ime, doza, vrijeme, nacin, kolicina, trajanje, podsjetnik } = req.body;
+    const { ime, doza, vrijeme, nacin, kolicina, trajanje, ucestalost, podsjetnik } = req.body;
     const noviLijek = await Lijek.create({
       korisnik: req.user.id,
       ime,
@@ -24,6 +24,7 @@ export const dodajLijek = async (req, res) => {
       kolicina: Number(kolicina),
       trajanje: Number(trajanje),
       preostalo: Number(kolicina),
+      ucestalost: Number(ucestalost) || 1,
       podsjetnik: Boolean(podsjetnik)
     });
     res.status(201).json(noviLijek);
@@ -33,13 +34,22 @@ export const dodajLijek = async (req, res) => {
   }
 };
 
-// Ažuriraj lijek
+export const dohvatiLijekPoId = async (req, res) => {
+  try {
+    const lijek = await Lijek.findById(req.params.id);
+    if (!lijek) return res.status(404).json({ message: "Lijek nije pronađen" });
+    res.json(lijek);
+  } catch (error) {
+    res.status(500).json({ message: "Greška pri dohvaćanju lijeka" });
+  }
+};
+// Azuriraj lijek
 export const azurirajLijek = async (req, res) => {
   try {
     const lijek = await Lijek.findById(req.params.id);
     if (!lijek) return res.status(404).json({ message: "Lijek nije pronađen" });
-
-    Object.assign(lijek, req.body);
+    const { ime, doza, vrijeme, nacin, kolicina, trajanje, ucestalost, podsjetnik } = req.body;
+    Object.assign(lijek, { ime, doza, vrijeme, nacin, kolicina: Number(kolicina), trajanje: Number(trajanje), ucestalost: Number(ucestalost) || 1, podsjetnik: Boolean(podsjetnik) });
     const azuriranLijek = await lijek.save();
     res.json(azuriranLijek);
   } catch (error) {
@@ -47,13 +57,13 @@ export const azurirajLijek = async (req, res) => {
   }
 };
 
+
 // Obriši lijek
 export const obrisiLijek = async (req, res) => {
   try {
-    const lijek = await Lijek.findById(req.params.id);
+    const lijek = await Lijek.findByIdAndDelete(req.params.id);
     if (!lijek) return res.status(404).json({ message: "Lijek nije pronađen" });
 
-    await lijek.remove();
     res.json({ message: "Lijek obrisan" });
   } catch (error) {
     res.status(500).json({ message: "Greška pri brisanju lijeka" });

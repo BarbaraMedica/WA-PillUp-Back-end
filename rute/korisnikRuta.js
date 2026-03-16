@@ -1,6 +1,6 @@
 import express from "express";
 import { dohvatiKorisnika, postaviIme, dohvatiPostavke, azurirajPostavke } from "../controllers/KorisnikController.js";
-import auth from "../middleware/auth";
+import auth from "../middleware/auth.js";
 const router = express.Router();
 
 router.get("/profil", auth, dohvatiKorisnika);

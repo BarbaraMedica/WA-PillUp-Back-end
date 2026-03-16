@@ -7,9 +7,9 @@ const uzimanjeSchema = new mongoose.Schema(
       ref: "Korisnik",
       required: true
     },
-    terapija: {
+    lijek: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Terapija",
+      ref: "Lijek",
       required: true
     },
     datum: {

@@ -1,19 +1,30 @@
-import UzimanjeLijeka from "../modeli/UzimanjeLijeka.js";
+import UzimanjeLijeka from "../models/UzimanjeLijeka.js";
+import Lijek from "../models/Lijek.js";
 
 export const potvrdiUzimanje = async (req, res) => {
   try {
-    const { terapijaId, vrijeme } = req.body;
+    const lijekId = req.params.id; // ID dolazi iz URL-a
+    const { vrijeme } = req.body;
 
+    // Dodaj zapis o uzimanju
     const zapis = await UzimanjeLijeka.create({
       korisnik: req.user.id,
-      terapija: terapijaId,
+      lijek: lijekId,
       datum: new Date(),
       vrijeme,
       status: "uzet"
     });
 
+    // Smanji preostalo tableta za 1 (ili više ako je učestalost)
+    const lijek = await Lijek.findById(lijekId);
+    if (lijek && lijek.preostalo > 0) {
+      lijek.preostalo -= 1; // Pretpostavimo 1 doza po uzimanju
+      await lijek.save();
+    }
+
     res.status(201).json(zapis);
   } catch (error) {
+    console.error("Greška pri spremanju uzimanja:", error);
     res.status(500).json({ message: "Greška pri spremanju uzimanja" });
   }
 };

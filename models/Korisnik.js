@@ -46,16 +46,11 @@ const korisnikSchema = new mongoose.Schema(
 );
 
 // hash lozinke
-korisnikSchema.pre("save", async function (next) {
-  if (!this.isModified("lozinka")) return next();
+korisnikSchema.pre("save", async function () {
+  if (!this.isModified("lozinka")) return;
 
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.lozinka = await bcrypt.hash(this.lozinka, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  const salt = await bcrypt.genSalt(10);
+  this.lozinka = await bcrypt.hash(this.lozinka, salt);
 });
 
 
