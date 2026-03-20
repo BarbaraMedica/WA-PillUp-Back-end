@@ -12,6 +12,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "bcrypt": "^6.0.0",
+    "chart.js": "^4.5.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
@@ -21,8 +22,10 @@
     "mongoose": "^9.1.4",
     "node-cron": "^4.2.1",
     "nodemailer": "^8.0.1",
+    "openai": "^6.32.0",
     "prisma": "^6.19.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "vue-chartjs": "^5.3.3"
   },
   "description": ""
 }

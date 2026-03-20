@@ -3,6 +3,8 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cron from "node-cron";
+//ai 
+import OpenAI from "openai";
 
 import Terapija from "./models/Terapija.js";
 import { sendEmail } from "./services/emailService.js";
@@ -18,7 +20,7 @@ import korisnikRuta from "./rute/korisnikRuta.js";
 import terapijaRuta from "./rute/terapijaRuta.js";
 import statistikaRuta from "./rute/statistika.js";
 import biljeskeRuta from "./rute/biljeskeRuta.js";
-
+import analizaRoutes from "./rute/analiza.js";
 // Učitavanje .env
 dotenv.config();
 
@@ -27,6 +29,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 //logger
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
@@ -48,6 +53,7 @@ app.use("/api/terapije", terapijaRuta);
 app.use("/api/izvjestaji", izvjestajRuta);
 app.use("/api/statistika", statistikaRuta);
 app.use("/api/biljeske", biljeskeRuta);
+app.use("/api/analiza", analizaRoutes);
 app.get("/", (req, res) => {
   res.send("PillUp backend radi!");
 });
@@ -134,6 +140,45 @@ app.use((err, req, res, next) => {
   });
 });
 
+//ai dio
+app.post("/analyze", async (req, res) => {
+  try {
+    const { adherence, avgMood, missed } = req.body;
+
+    if (adherence === undefined || avgMood === undefined || missed === undefined) {
+      return res.status(400).json({ error: "Nedostaju podaci: adherence, avgMood ili missed" });
+    }
+
+    const prompt = `Evo podaci korisnika: ${JSON.stringify(req.body)}. 
+Daj mi JSON odgovor sa poljima:
+1) interpretation - kratka interpretacija performansi
+2) advice - savjet kako poboljšati adherence i raspoloženje
+3) actions - lista konkretnih akcija za korisnika
+Odgovori samo JSON.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+      messages: [
+        { role: "system", content: "Ti si stručni AI coach za zdravlje i produktivnost." },
+        { role: "user", content: prompt }
+      ]
+    });
+
+    const aiOutput = response.choices[0].message.content;
+
+    let parsed;
+    try {
+      parsed = JSON.parse(aiOutput);
+    } catch {
+      parsed = { interpretation: aiOutput, advice: "", actions: [] };
+    }
+
+    res.json(parsed);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Došlo je do greške u AI analizi" });
+  }
+});
 
 const PORT = process.env.PORT || 4000;
 
