@@ -61,11 +61,16 @@ export const azurirajLijek = async (req, res) => {
 // Obriši lijek
 export const obrisiLijek = async (req, res) => {
   try {
-    const lijek = await Lijek.findByIdAndDelete(req.params.id);
+    const lijek = await Lijek.findById(req.params.id);
     if (!lijek) return res.status(404).json({ message: "Lijek nije pronađen" });
-
+    // provjera vlasništva
+    if (lijek.korisnik.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Ne možete obrisati tuđi lijek" });
+    }
+    await lijek.deleteOne();
     res.json({ message: "Lijek obrisan" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Greška pri brisanju lijeka" });
   }
 };

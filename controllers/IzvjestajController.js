@@ -22,7 +22,7 @@ export const generirajPDF = async (req, res) => {
 };
 
 // Dohvati uzete lijekove
-export const dohvatiUžeteLijekove = async (req, res) => {
+export const dohvatiUzeteLijekove = async (req, res) => {
   try {
     const korisnikId = req.user.id;
     // Pretpostavimo da ima polje za uzete lijekove, za sada vraćam sve

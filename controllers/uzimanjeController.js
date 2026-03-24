@@ -28,3 +28,23 @@ export const potvrdiUzimanje = async (req, res) => {
     res.status(500).json({ message: "Greška pri spremanju uzimanja" });
   }
 };
+
+export const uzimanjeStatistika = async (req, res) => {
+  try {
+    const uzimanja = await UzimanjeLijeka.find({ korisnik: req.user.id });
+    const total = uzimanja.length;
+
+    if (!total) return res.json({ naVrijeme: 0, kasno: 0, preskoceno: 0 });
+
+    const naVrijeme = uzimanja.filter(u => u.status === "uzet").length;
+    const preskoceno = uzimanja.filter(u => u.status === "preskocen").length;
+
+    res.json({
+      naVrijeme: Math.round((naVrijeme / total) * 100),
+      kasno: 0,
+      preskoceno: Math.round((preskoceno / total) * 100),
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
