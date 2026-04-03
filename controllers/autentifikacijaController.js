@@ -12,8 +12,19 @@ async function registracija(req, res, next) {
       return res.status(400).json({ msg: "Korisnik već postoji" });
     }
 
-    const korisnik = new Korisnik({ email, lozinka });
+    // token dodan
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    const korisnik = new Korisnik({ email, lozinka, verificationToken, isVerified: false });
     await korisnik.save();
+
+    // i slanje maila
+    const verifyUrl = `${process.env.BASE_URL}/api/autentikacija/verify/${verificationToken}`;
+    await sendEmail(
+      email,
+      "PillUp - Potvrdi svoju email adresu",
+      `Dobrodošao/la u PillUp!\n\nPotvrdi svoju email adresu klikom na ovaj link:\n${verifyUrl}\n\nLink vrijedi 24 sata.`
+    );
 
     res.status(201).json({ msg: "Registracija uspješna" });
   } catch (err) {

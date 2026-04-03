@@ -10,8 +10,16 @@ const raspolozenjeSchema = new mongoose.Schema(
     },
     datum: { type: Date, default: Date.now },
     raspolozenje: { type: String, required: true },
-    biljeske: String
+    biljeske: String,
+    stanje: {
+    type: String,
+    enum: ["pozitivno", "neutralno", "negativno"],
+    required: true
+    },
   },
   { timestamps: true }
 );
+
+
 export default mongoose.model("Raspolozenje", raspolozenjeSchema);
+

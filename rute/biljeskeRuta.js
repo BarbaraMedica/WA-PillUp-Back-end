@@ -8,9 +8,15 @@ const router = express.Router();
 router.get("/", auth, async (req, res) => {
   try {
     const biljeske = await Biljeska.find({ korisnik: req.user.id})
-      .populate("lijek_id", "naziv doza")
-      .sort({ createdAt: -1 });
-    res.json(biljeske);
+    .populate("lijek_id", "ime doza")
+    .sort({ createdAt: -1 });
+
+  const formatirane = biljeske.map(b => ({
+    ...b.toObject(),
+    lijek_ime: b.lijek_id?.ime
+  }));
+
+    res.json(formatirane);
   } catch (err) {
     res.status(500).json({ msg: "Greška pri dohvaćanju bilješki" });
   }

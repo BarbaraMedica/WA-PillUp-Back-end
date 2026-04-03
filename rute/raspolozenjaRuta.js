@@ -19,11 +19,12 @@ router.get("/", auth, async (req, res) => {
 // POST – dodaj raspoloženje prijavljenom korisniku
 router.post("/", auth, async (req, res) => {
   try {
-    const { datum, raspolozenje, biljeske } = req.body;
+    const { datum, raspolozenje, stanje, biljeske } = req.body;
 
     const novoRaspolozenje = new Raspolozenje({
       datum,
       raspolozenje,
+      stanje,
       biljeske,
       korisnik: req.user.id
     });

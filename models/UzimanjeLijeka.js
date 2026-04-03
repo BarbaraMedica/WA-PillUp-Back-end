@@ -1,32 +1,16 @@
 import mongoose from "mongoose";
 
-const uzimanjeSchema = new mongoose.Schema(
-  {
-    korisnik: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Korisnik",
-      required: true
-    },
-    lijek: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Lijek",
-      required: true
-    },
-    datum: {
-      type: Date,
-      required: true
-    },
-    vrijeme: {
-      type: String, // "08:00"
-      required: true
-    },
-    status: {
-      type: String,
-      enum: ["uzet", "preskocen"],
-      required: true
-    }
-  },
-  { timestamps: true }
-);
+const UzimanjeLijekaSchema = new mongoose.Schema({
+  korisnik: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  lijek: { type: mongoose.Schema.Types.ObjectId, ref: "Lijek", required: true },
+  datum: { type: Date, required: true }, 
+  vrijeme: { type: String, required: true }, 
+  vrijemeUzimanja: { type: Date }, // stvarno vrijeme uzimanja
+  status: { 
+    type: String, 
+    enum: ["na_vrijeme", "kasno", "preskoceno"], 
+    default: null 
+  }
+});
 
-export default mongoose.model("UzimanjeLijeka", uzimanjeSchema);
+export default mongoose.model("UzimanjeLijeka", UzimanjeLijekaSchema);

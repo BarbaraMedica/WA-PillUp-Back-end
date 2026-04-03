@@ -1,10 +1,30 @@
 import Lijek from "../models/Lijek.js";
+import UzimanjeLijeka from "../models/UzimanjeLijeka.js";
 
 // Dohvati sve lijekove za korisnika
 export const dohvatiLijekove = async (req, res) => {
   try {
     const korisnikId = req.user.id;
     const lijekovi = await Lijek.find({ korisnik: korisnikId });
+    const danas = new Date();
+    danas.setHours(0,0,0,0);
+    for (let lijek of lijekovi) {
+    const postoji = await UzimanjeLijeka.findOne({
+      korisnik: req.user.id,
+      lijek: lijek._id,
+      datum: new Date().toDateString(),
+      vrijeme: lijek.vrijeme
+    });
+
+    if (!postoji) {
+      await UzimanjeLijeka.create({
+        korisnik: req.user.id,
+        lijek: lijek._id,
+        datum: new Date(),
+        vrijeme: lijek.vrijeme
+      });
+    }
+  }
     res.json(lijekovi);
   } catch (error) {
     res.status(500).json({ message: "Greška pri dohvaćanju lijekova" });
