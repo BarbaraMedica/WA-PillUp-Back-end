@@ -49,8 +49,12 @@ const korisnikSchema = new mongoose.Schema(
 korisnikSchema.pre("save", async function () {
   if (!this.isModified("lozinka")) return;
 
-  const salt = await bcrypt.genSalt(10);
-  this.lozinka = await bcrypt.hash(this.lozinka, salt);
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.lozinka = await bcrypt.hash(this.lozinka, salt);
+  } catch (err) {
+    throw err;
+  }
 });
 
 

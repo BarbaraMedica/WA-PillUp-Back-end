@@ -5,10 +5,17 @@ import { sendEmail } from "../services/emailService.js";
 
 async function registracija(req, res, next) {
   try {
+    console.log("Počela registracija za email:", req.body.email);
+    
     const { email, lozinka } = req.body;
+
+    if (!email || !lozinka) {
+      return res.status(400).json({ errors: [{ msg: "Email i lozinka su obavezni" }] });
+    }
 
     const postoji = await Korisnik.findOne({ email });
     if (postoji) {
+      console.log("Korisnik već postoji:", email);
       return res.status(400).json({ msg: "Korisnik već postoji" });
     }
 
@@ -17,18 +24,39 @@ async function registracija(req, res, next) {
 
     const korisnik = new Korisnik({ email, lozinka, verificationToken, isVerified: false });
     await korisnik.save();
-
-    // i slanje maila
-    const verifyUrl = `${process.env.BASE_URL}/api/autentikacija/verify/${verificationToken}`;
-    await sendEmail(
-      email,
-      "PillUp - Potvrdi svoju email adresu",
-      `Dobrodošao/la u PillUp!\n\nPotvrdi svoju email adresu klikom na ovaj link:\n${verifyUrl}\n\nLink vrijedi 24 sata.`
-    );
+    
+    console.log("Korisnik spremljen u bazu:", email);
 
     res.status(201).json({ msg: "Registracija uspješna" });
+
+    // Email se šalje u pozadini 
+    const verifyUrl = `${process.env.BASE_URL}/api/autentikacija/verify/${verificationToken}`;
+    setImmediate(() => {
+      sendEmail(
+        email,
+        "PillUp - Potvrdi svoju email adresu",
+        `Dobrodošao/la u PillUp!\n\nPotvrdi svoju email adresu klikom na ovaj link:\n${verifyUrl}\n\nLink vrijedi 24 sata.`
+      ).then(() => {
+        console.log("Email uspješno poslan za:", email);
+      }).catch(err => {
+        console.error("Greška pri slanju emaila za", email, ":", err.message);
+      });
+    });
+
   } catch (err) {
-    next(err);
+    console.error("Greška pri registraciji:", err.message);
+    
+    // Ako je validation error
+    if (err.name === "ValidationError") {
+      const messages = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ errors: [{ msg: messages.join(", ") }] });
+    }
+  
+    if (err.code === 11000) {
+      return res.status(400).json({ errors: [{ msg: "Email je već registriran" }] });
+    }
+    
+    res.status(500).json({ errors: [{ msg: "Greška na serveru" }] });
   }
 }
 
